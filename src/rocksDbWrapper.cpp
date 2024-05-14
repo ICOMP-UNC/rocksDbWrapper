@@ -45,12 +45,17 @@ bool RocksDbWrapper::get(const std::string& key, std::string& value)
 {
     rocksdb::Status status = m_database->Get(rocksdb::ReadOptions(), key, &value);
 
+    if (status.IsNotFound())
+    {
+        return false;
+    }
+
     if (!status.ok())
     {
         throw std::runtime_error("Failed to get key-value pair: " + status.ToString());
     }
 
-    return !status.IsNotFound();
+    return true;
 }
 
 void RocksDbWrapper::delete_(const std::string& key)
